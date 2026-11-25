@@ -2,23 +2,27 @@ import click
 import re
 import sys
 import tiktoken
-from ttok import __version__
 
 
 @click.command()
-@click.version_option(version=__version__)
+@click.version_option()
 @click.argument("prompt", nargs=-1)
 @click.option("-i", "--input", "input", type=click.File("r"))
 @click.option(
     "-t", "--truncate", "truncate", type=int, help="Truncate to this many tokens"
 )
-@click.option("-m", "--model", default="gpt-3.5-turbo", help="Which model to use")
+@click.option(
+    "-m", "--model", default="gpt-5", show_default=True, help="Which model to use"
+)
 @click.option("encode_tokens", "--encode", is_flag=True, help="Output token integers")
 @click.option(
     "decode_tokens", "--decode", is_flag=True, help="Convert token integers to text"
 )
 @click.option("as_tokens", "--tokens", is_flag=True, help="Output full tokens")
 @click.option("--allow-special", is_flag=True, help="Do not error on special tokens")
+@click.option(
+    "--list-models", is_flag=True, help="List model names and prefixes and exit"
+)
 def cli(
     prompt,
     input,
@@ -28,6 +32,7 @@ def cli(
     decode_tokens,
     as_tokens,
     allow_special,
+    list_models,
 ):
     """
     Count and truncate text based on tokens
@@ -54,7 +59,7 @@ def cli(
 
     To convert tokens back to text:
 
-        ttok 9906 1917 --decode
+        ttok 13225 2375 --decode
 
     To see the details of the tokens:
 
@@ -63,13 +68,20 @@ def cli(
     Outputs:
 
         [b'hello', b' world']
+
+    To list model names and prefixes:
+
+        ttok --list-models
     """
+    if list_models:
+        for model_name, encoding_name in tiktoken.model.MODEL_TO_ENCODING.items():
+            click.echo(f"{model_name} ({encoding_name})")
+        click.echo("\nModel prefixes (matched in order after exact names):")
+        for model_prefix, encoding_name in tiktoken.model.MODEL_PREFIX_TO_ENCODING.items():
+            click.echo(f"{model_prefix}* ({encoding_name})")
+        return
     if decode_tokens and encode_tokens:
         raise click.ClickException("Cannot use --decode with --encode")
-    if allow_special and not (encode_tokens or as_tokens):
-        raise click.ClickException(
-            "Cannot use --allow-special without --encode or --tokens"
-        )
     if as_tokens and not decode_tokens and not encode_tokens:
         encode_tokens = True
     try:

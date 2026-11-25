@@ -1,28 +1,15 @@
-[build-system]
-requires = ["setuptools>=80"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "ttok"
-dynamic = ["version"]
+version = "1.0"
 description = "Count and truncate text based on tokens"
 readme = "README.md"
 requires-python = ">=3.10"
+authors = [{name = "Simon Willison"}]
 license = "Apache-2.0"
 license-files = ["LICENSE"]
-authors = [{ name = "Simon Willison" }]
 dependencies = [
-    "click>=8.3.1",
+    "click",
     "tiktoken>=0.12.0",
-]
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
 ]
 
 [project.urls]
@@ -35,13 +22,14 @@ Changelog = "https://github.com/simonw/ttok/releases"
 ttok = "ttok.cli:cli"
 
 [dependency-groups]
-test = [
-    "cogapp>=3.6.0",
-    "pytest>=9.0.0",
+dev = [
+    "pytest",
+    "cogapp",
 ]
 
-[tool.setuptools]
-packages = ["ttok"]
+[build-system]
+requires = ["uv_build>=0.11.0,<0.12.0"]
+build-backend = "uv_build"
 
-[tool.setuptools.dynamic]
-version = { attr = "ttok.__version__" }
+[tool.uv.build-backend]
+module-root = ""
